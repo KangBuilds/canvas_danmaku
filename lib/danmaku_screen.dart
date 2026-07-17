@@ -64,8 +64,8 @@ class _DanmakuScreenState<T> extends State<DanmakuScreen<T>>
   late final _random = Random();
 
   late final Ticker _ticker;
-  late final ValueNotifier<int> _notifier;
-  late int _lastTick = 0;
+  late final ValueNotifier<double> _notifier;
+  late double _lastTick = 0;
 
   /// 运行状态
   bool _running = true;
@@ -82,7 +82,7 @@ class _DanmakuScreenState<T> extends State<DanmakuScreen<T>>
     _danmakuHeight = _textPainter.height;
 
     _ticker = createTicker(_tick);
-    _notifier = ValueNotifier(0);
+    _notifier = ValueNotifier(0.0);
 
     widget.createdController(DanmakuController<T>(
       addDanmaku: _addDanmaku,
@@ -126,7 +126,9 @@ class _DanmakuScreenState<T> extends State<DanmakuScreen<T>>
 
   int _time = 0;
   void _tick(Duration elapsed) {
-    _notifier.value = elapsed.inMilliseconds + _lastTick;
+    _notifier.value =
+        elapsed.inMicroseconds / Duration.microsecondsPerMillisecond +
+        _lastTick;
     if (_time++ > 10) {
       _time = 0;
       _lazyTick(_notifier.value);
@@ -441,7 +443,7 @@ class _DanmakuScreenState<T> extends State<DanmakuScreen<T>>
   }
 
   @pragma("vm:prefer-inline")
-  void _lazyTick(int tick) {
+  void _lazyTick(double tick) {
     // 移除屏幕外滚动弹幕
     for (var i in _scrollDanmakuItems) {
       i.removeWhereUnsafe((item) => item.needRemove(item.expired ||
