@@ -27,6 +27,7 @@ final class ScrollDanmakuPainter extends BaseDanmakuPainter {
   void paint(ui.Canvas canvas, ui.Size size) {
     final ui.PictureRecorder? pictureRecorder;
     final Canvas pictureCanvas;
+    final length = danmakuItems.fold<int>(0, (p, n) => p + n.length);
 
     if (length > batchThreshold) {
       pictureRecorder = ui.PictureRecorder();
