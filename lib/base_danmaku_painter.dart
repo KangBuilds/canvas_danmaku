@@ -8,7 +8,10 @@ abstract base class BaseDanmakuPainter extends CustomPainter {
   final double strokeWidth;
   final bool running;
   final int batchThreshold;
-  final int tick;
+  final int _tick;
+  final ValueListenable<int>? repaint;
+
+  int get tick => repaint?.value ?? _tick;
 
   static final Paint _paint = Paint();
 
@@ -18,9 +21,11 @@ abstract base class BaseDanmakuPainter extends CustomPainter {
     required this.fontWeight,
     required this.strokeWidth,
     required this.running,
-    required this.tick,
+    required int tick,
+    this.repaint,
     this.batchThreshold = 10, // 默认值为10，可以自行调整
-  });
+  }) : _tick = tick,
+        super(repaint: repaint);
 
   static void paintImg(
     Canvas canvas,

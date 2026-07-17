@@ -319,6 +319,7 @@ class _DanmakuScreenState<T> extends State<DanmakuScreen<T>>
       _option = option;
       _danmakuHeight = _textPainter.height;
       _calcTracks();
+      if (mounted) setState(() {});
       return;
     }
 
@@ -386,12 +387,10 @@ class _DanmakuScreenState<T> extends State<DanmakuScreen<T>>
     if (fontSizeChanged || areaChanged || safeAreaChanged) {
       _calcTracks();
     }
+    if (mounted) setState(() {});
 
     if (needRestart) {
       _ticker.start();
-    } else {
-      _notifier.refresh();
-      _staticDanmakuItems.refresh();
     }
   }
 
@@ -514,26 +513,22 @@ class _DanmakuScreenState<T> extends State<DanmakuScreen<T>>
       child: Stack(
         children: [
           RepaintBoundary.wrap(
-            ValueListenableBuilder(
-              valueListenable: _notifier,
-              builder: (context, value, child) {
-                return CustomPaint(
-                  willChange: _running,
-                  painter: ScrollDanmakuPainter(
-                    length: _scrollDanmakuItems.fold<int>(
-                        0, (p, n) => p + n.length),
-                    trackHeight: _danmakuHeight,
-                    danmakuItems: _scrollDanmakuItems,
-                    durationInMilliseconds: _scrollVelocityOrDuration,
-                    fontSize: _option.fontSize,
-                    fontWeight: _option.fontWeight,
-                    strokeWidth: _option.strokeWidth,
-                    running: _running,
-                    tick: value,
-                  ),
-                  size: widget.size,
-                );
-              },
+            CustomPaint(
+              willChange: _running,
+              painter: ScrollDanmakuPainter(
+                length: _scrollDanmakuItems.fold<int>(
+                    0, (p, n) => p + n.length),
+                trackHeight: _danmakuHeight,
+                danmakuItems: _scrollDanmakuItems,
+                durationInMilliseconds: _scrollVelocityOrDuration,
+                fontSize: _option.fontSize,
+                fontWeight: _option.fontWeight,
+                strokeWidth: _option.strokeWidth,
+                running: _running,
+                tick: _notifier.value,
+                repaint: _notifier,
+              ),
+              size: widget.size,
             ),
             0,
           ),
@@ -560,23 +555,19 @@ class _DanmakuScreenState<T> extends State<DanmakuScreen<T>>
             1,
           ),
           RepaintBoundary.wrap(
-            ValueListenableBuilder(
-              valueListenable: _notifier, // 与滚动弹幕共用控制器
-              builder: (context, value, child) {
-                return CustomPaint(
-                  willChange: _running,
-                  painter: SpecialDanmakuPainter(
-                    length: _specialDanmakuItems.length,
-                    danmakuItems: _specialDanmakuItems,
-                    fontSize: _option.fontSize,
-                    fontWeight: _option.fontWeight,
-                    strokeWidth: _option.strokeWidth,
-                    running: _running,
-                    tick: value,
-                  ),
-                  size: widget.size,
-                );
-              },
+            CustomPaint(
+              willChange: _running,
+              painter: SpecialDanmakuPainter(
+                length: _specialDanmakuItems.length,
+                danmakuItems: _specialDanmakuItems,
+                fontSize: _option.fontSize,
+                fontWeight: _option.fontWeight,
+                strokeWidth: _option.strokeWidth,
+                running: _running,
+                tick: _notifier.value,
+                repaint: _notifier,
+              ),
+              size: widget.size,
             ),
             2,
           ),
