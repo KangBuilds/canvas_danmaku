@@ -1,4 +1,5 @@
 import 'package:canvas_danmaku/canvas_danmaku.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
 abstract base class BaseDanmakuPainter extends CustomPainter {
